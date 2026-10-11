@@ -1,0 +1,10 @@
+{
+  "id": "obsidian-dashboard",
+  "name": "Dashboard",
+  "version": "0.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "An at-a-glance dashboard: note counts per top-level folder and a GitHub-style activity heatmap.",
+  "author": "",
+  "authorUrl": "",
+  "isDesktopOnly": true
+}

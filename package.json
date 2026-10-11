@@ -1,0 +1,22 @@
+{
+  "name": "obsidian-dashboard",
+  "version": "0.1.0",
+  "description": "An at-a-glance dashboard: note counts per top-level folder and a GitHub-style activity heatmap.",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc --noEmit && node esbuild.config.mjs production",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.21.0",
+    "jsdom": "^24.0.0",
+    "obsidian": "^1.5.7",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}
