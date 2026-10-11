@@ -1,1 +1,23 @@
 /* Filled in Task 6. */
+
+.dashboard-tiles {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.dashboard-tile {
+	padding: 8px 12px;
+}
+
+.dashboard-heatmap-grid {
+	display: grid;
+	grid-auto-flow: column;
+	grid-template-rows: repeat(7, 12px);
+	gap: 2px;
+}
+
+.dashboard-cell {
+	width: 12px;
+	height: 12px;
+}
