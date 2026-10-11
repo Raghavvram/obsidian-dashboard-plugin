@@ -60,8 +60,12 @@ export function renderHeatmap(container: HTMLElement, model: HeatmapModel): void
 			const cellEl = document.createElement("div");
 			cellEl.className = `dashboard-cell level-${cell.level}`;
 			if (cell.isFuture) cellEl.classList.add("is-future");
-			cellEl.setAttribute("data-date", cell.dateKey);
-			cellEl.setAttribute("title", `${cell.count} ${cell.count === 1 ? "note" : "notes"} on ${cell.dateKey}`);
+			if (cell.isPadding) {
+				cellEl.classList.add("is-padding");
+			} else {
+				cellEl.setAttribute("data-date", cell.dateKey);
+				cellEl.setAttribute("title", `${cell.count} ${cell.count === 1 ? "note" : "notes"} on ${cell.dateKey}`);
+			}
 			grid.appendChild(cellEl);
 		}
 	}
@@ -70,7 +74,45 @@ export function renderHeatmap(container: HTMLElement, model: HeatmapModel): void
 	container.appendChild(heatmap);
 }
 
-export function renderDashboard(container: HTMLElement, counts: FolderCount[], model: HeatmapModel): void {
+export interface YearSelectorOptions {
+	years: number[];
+	selectedYear: number | null;
+	onChange: (year: number | null) => void;
+}
+
+export function renderYearSelector(container: HTMLElement, options: YearSelectorOptions): void {
+	const select = document.createElement("select");
+	select.className = "dashboard-heatmap-year";
+
+	const recent = document.createElement("option");
+	recent.value = "recent";
+	recent.textContent = "Recent";
+	select.appendChild(recent);
+
+	const years = [...options.years].sort((a, b) => b - a);
+	for (const year of years) {
+		const option = document.createElement("option");
+		option.value = String(year);
+		option.textContent = String(year);
+		if (options.selectedYear === year) option.selected = true;
+		select.appendChild(option);
+	}
+	if (options.selectedYear === null) recent.selected = true;
+
+	select.addEventListener("change", () => {
+		options.onChange(select.value === "recent" ? null : Number(select.value));
+	});
+
+	container.appendChild(select);
+}
+
+export interface DashboardOptions {
+	years?: number[];
+	selectedYear?: number | null;
+	onChange?: (year: number | null) => void;
+}
+
+export function renderDashboard(container: HTMLElement, counts: FolderCount[], model: HeatmapModel, options?: DashboardOptions): void {
 	clear(container);
 	const root = document.createElement("div");
 	root.className = "dashboard";
@@ -81,7 +123,16 @@ export function renderDashboard(container: HTMLElement, counts: FolderCount[], m
 
 	const heatmapSection = document.createElement("div");
 	heatmapSection.className = "dashboard-heatmap-section";
-	renderHeatmap(heatmapSection, model);
+	if (options?.years && options.years.length > 0) {
+		renderYearSelector(heatmapSection, {
+			years: options.years,
+			selectedYear: options.selectedYear ?? null,
+			onChange: options.onChange ?? (() => {}),
+		});
+	}
+	const heatmapWrap = document.createElement("div");
+	renderHeatmap(heatmapWrap, model);
+	heatmapSection.appendChild(heatmapWrap);
 
 	root.appendChild(tilesSection);
 	root.appendChild(heatmapSection);

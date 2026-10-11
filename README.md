@@ -7,7 +7,8 @@ of your vault, showing:
   inside it (including notes in subfolders).
 - A **GitHub-style activity heatmap** of the past ~12 months, where each
   day's intensity reflects how many markdown notes were created or
-  modified that day.
+  modified that day. A **year selector** above the heatmap switches it to
+  any past calendar year in the vault.
 
 ## How to open it
 
@@ -26,13 +27,19 @@ use the refresh action in the view's header. From the command palette:
 
 ## How the heatmap works
 
-- Covers the last 53 weeks, columns = weeks, rows = days of the week.
+- **Recent** (default) covers the last 53 weeks; columns = weeks, rows =
+  days of the week. The dropdown also lists every calendar year that has
+  activity; picking one shows that year's heatmap (Jan 1 – Dec 31), with
+  the surrounding days rendered as blank padding cells.
 - A day's intensity is the number of distinct markdown notes created or
   modified that day. A note created and modified on the same day counts
-  once.
+  once. Intensity is scaled to the busiest day within the view (recent
+  window, or the selected year) — an older spike doesn't wash out a
+  calmer period.
 - The heatmap is a **snapshot of the vault's current file timestamps** —
   it is recomputed on every refresh and does not store history. Editing a
-  note again on a later day will overwrite its earlier activity.
+  note again on a later day will overwrite its earlier activity. Because
+  of this, a past year's heatmap reflects notes that still exist today.
 
 ### Platform caveat
 

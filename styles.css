@@ -42,6 +42,17 @@
 	font-style: italic;
 }
 
+.dashboard-heatmap-section {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.dashboard-heatmap-year {
+	width: max-content;
+	font-size: var(--font-ui-small);
+}
+
 .dashboard-heatmap {
 	overflow-x: auto;
 }
@@ -91,4 +102,9 @@
 
 .dashboard-cell.is-future {
 	visibility: hidden;
+}
+
+.dashboard-cell.is-padding {
+	background-color: transparent;
+	border: none;
 }

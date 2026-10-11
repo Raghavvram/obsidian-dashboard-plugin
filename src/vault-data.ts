@@ -48,3 +48,11 @@ export function buildActivityCounts(files: VaultFile[]): Map<string, number> {
 	}
 	return counts;
 }
+
+export function availableYears(activity: Map<string, number>): number[] {
+	const years = new Set<number>();
+	for (const key of activity.keys()) {
+		years.add(Number(key.slice(0, 4)));
+	}
+	return [...years].sort((a, b) => a - b);
+}

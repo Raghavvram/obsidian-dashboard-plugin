@@ -1,13 +1,14 @@
 import { ItemView, TFolder, WorkspaceLeaf } from "obsidian";
 import type DashboardPlugin from "./main";
-import { buildActivityCounts, buildFolderCounts, selectVaultFiles } from "./vault-data";
-import { buildHeatmap } from "./heatmap";
+import { buildActivityCounts, buildFolderCounts, availableYears, selectVaultFiles } from "./vault-data";
+import { buildHeatmap, buildYearHeatmap } from "./heatmap";
 import { renderDashboard } from "./render";
 
 export const DASHBOARD_VIEW_TYPE = "dashboard-view";
 
 export class DashboardView extends ItemView {
 	private plugin: DashboardPlugin;
+	private selectedYear: number | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: DashboardPlugin) {
 		super(leaf);
@@ -54,8 +55,21 @@ export class DashboardView extends ItemView {
 			.map((folder) => folder.name);
 		const counts = buildFolderCounts(selected, folderNames);
 		const activity = buildActivityCounts(selected);
-		const model = buildHeatmap(activity, new Date());
+		const years = availableYears(activity);
+		if (this.selectedYear !== null && !years.includes(this.selectedYear)) {
+			this.selectedYear = null;
+		}
+		const model = this.selectedYear === null
+			? buildHeatmap(activity, new Date())
+			: buildYearHeatmap(activity, this.selectedYear, new Date());
 		this.contentEl.empty();
-		renderDashboard(this.contentEl, counts, model);
+		renderDashboard(this.contentEl, counts, model, {
+			years,
+			selectedYear: this.selectedYear,
+			onChange: (year) => {
+				this.selectedYear = year;
+				this.refresh();
+			},
+		});
 	}
 }

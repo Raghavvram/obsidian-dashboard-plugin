@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { renderTiles, renderHeatmap, renderDashboard } from "../src/render";
-import { buildHeatmap } from "../src/heatmap";
+import { renderTiles, renderHeatmap, renderDashboard, renderYearSelector } from "../src/render";
+import { buildHeatmap, buildYearHeatmap } from "../src/heatmap";
 
 let el: HTMLElement;
 beforeEach(() => { el = document.createElement("div"); });
@@ -39,10 +39,40 @@ describe("renderHeatmap", () => {
   });
 });
 
+describe("renderYearSelector", () => {
+  it("renders a Recent option plus one option per year in descending order", () => {
+    renderYearSelector(el, { years: [2024, 2025, 2026], selectedYear: null, onChange: () => {} });
+    const select = el.querySelector("select.dashboard-heatmap-year")!;
+    expect(select).not.toBeNull();
+    const options = Array.from(select.querySelectorAll("option")).map((o) => o.textContent);
+    expect(options).toEqual(["Recent", "2026", "2025", "2024"]);
+    expect(select.querySelector("option")!.selected).toBe(true);
+  });
+  it("selects the chosen year and reports changes as a year or Recent", () => {
+    const picked: (number | null)[] = [];
+    renderYearSelector(el, { years: [2024, 2026], selectedYear: 2024, onChange: (y) => picked.push(y) });
+    const select = el.querySelector("select.dashboard-heatmap-year") as HTMLSelectElement;
+    expect(select.value).toBe("2024");
+    select.value = "2026";
+    select.dispatchEvent(new Event("change"));
+    select.value = "recent";
+    select.dispatchEvent(new Event("change"));
+    expect(picked).toEqual([2026, null]);
+  });
+});
+
 describe("renderDashboard", () => {
   it("renders tiles and heatmap together", () => {
     renderDashboard(el, [{ name: "Work", count: 1 }], buildHeatmap(new Map(), new Date(2026, 9, 12)));
     expect(el.querySelector(".dashboard-tile")).not.toBeNull();
     expect(el.querySelectorAll(".dashboard-cell")).toHaveLength(53 * 7);
+  });
+  it("embeds the year selector when years are provided", () => {
+    renderDashboard(el, [], buildYearHeatmap(new Map(), 2026, new Date(2026, 9, 12)), {
+      years: [2026],
+      selectedYear: null,
+      onChange: () => {},
+    });
+    expect(el.querySelector("select.dashboard-heatmap-year")).not.toBeNull();
   });
 });

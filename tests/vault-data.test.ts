@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   isMarkdownPath, isHiddenPath, selectVaultFiles,
-  buildFolderCounts, buildActivityCounts, type VaultFile,
+  buildFolderCounts, buildActivityCounts, availableYears, type VaultFile,
 } from "../src/vault-data";
 
 const f = (path: string, ctime: number, mtime: number): VaultFile => ({ path, ctime, mtime });
@@ -77,5 +77,19 @@ describe("buildActivityCounts", () => {
     const t = new Date(2026, 9, 12, 9, 0).getTime();
     const counts = buildActivityCounts([f("a.md", t, t), f("b.md", t, t)]);
     expect(counts.get("2026-10-12")).toBe(2);
+  });
+});
+
+describe("availableYears", () => {
+  it("returns sorted years present in the activity, ascending", () => {
+    const activity = new Map([
+      ["2024-01-01", 1],
+      ["2026-12-31", 2],
+      ["2025-06-15", 3],
+    ]);
+    expect(availableYears(activity)).toEqual([2024, 2025, 2026]);
+  });
+  it("returns an empty list for no activity", () => {
+    expect(availableYears(new Map())).toEqual([]);
   });
 });
