@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf } from "obsidian";
+import { ItemView, TFolder, WorkspaceLeaf } from "obsidian";
 import type DashboardPlugin from "./main";
 import { buildActivityCounts, buildFolderCounts, selectVaultFiles } from "./vault-data";
 import { buildHeatmap } from "./heatmap";
@@ -49,7 +49,10 @@ export class DashboardView extends ItemView {
 			return typeof mc.isUserIgnored === "function" ? mc.isUserIgnored(p) : false;
 		};
 		const selected = selectVaultFiles(files, isIgnored);
-		const counts = buildFolderCounts(selected);
+		const folderNames = this.app.vault.getRoot().children
+			.filter((child): child is TFolder => child instanceof TFolder && !child.name.startsWith("."))
+			.map((folder) => folder.name);
+		const counts = buildFolderCounts(selected, folderNames);
 		const activity = buildActivityCounts(selected);
 		const model = buildHeatmap(activity, new Date());
 		this.contentEl.empty();

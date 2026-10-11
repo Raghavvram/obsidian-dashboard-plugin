@@ -46,4 +46,21 @@ describe("buildHeatmap", () => {
       expect(label.length).toBeGreaterThan(0);
     }
   });
+
+  it("scales levels against the busiest day inside the window, ignoring older spikes", () => {
+    const activity = new Map([["2024-01-01", 100], ["2026-10-12", 5]]);
+    const m = buildHeatmap(activity, today);
+    const byKey = Object.fromEntries(m.weeks.flat().map((c) => [c.dateKey, c]));
+    expect(m.maxCount).toBe(5);
+    expect(byKey["2026-10-12"].level).toBe(4);
+  });
+
+  it("emits month labels at the 1-based grid column of the week a month begins", () => {
+    const m = buildHeatmap(new Map(), today);
+    for (const { columnIndex } of m.monthLabels) {
+      const i = columnIndex - 1;
+      expect(i).toBeGreaterThanOrEqual(1);
+      expect(m.weeks[i][0].date.getMonth()).not.toBe(m.weeks[i - 1][0].date.getMonth());
+    }
+  });
 });

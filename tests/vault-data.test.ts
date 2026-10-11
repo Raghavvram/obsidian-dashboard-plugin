@@ -49,6 +49,15 @@ describe("buildFolderCounts", () => {
   it("skips notes sitting at the vault root", () => {
     expect(buildFolderCounts([f("root-note.md", 0, 0)])).toEqual([]);
   });
+  it("includes top-level folders with no markdown notes at count 0", () => {
+    expect(buildFolderCounts([f("Work/a.md", 0, 0)], ["Empty", "Work"])).toEqual([
+      { name: "Empty", count: 0 },
+      { name: "Work", count: 1 },
+    ]);
+  });
+  it("renders no tiles when there are no folders", () => {
+    expect(buildFolderCounts([], [])).toEqual([]);
+  });
 });
 
 describe("buildActivityCounts", () => {

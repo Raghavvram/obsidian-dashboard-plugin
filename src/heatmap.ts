@@ -27,13 +27,21 @@ export interface HeatmapModel {
 
 export function buildHeatmap(activity: Map<string, number>, today: Date): HeatmapModel {
 	const todayKey = toDateKey(today);
-	const maxCount = Math.max(0, ...activity.values());
 
 	// Grid ends on the Saturday of the week containing today.
 	const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 	end.setDate(end.getDate() + (6 - end.getDay()));
 	const start = new Date(end);
 	start.setDate(start.getDate() - (53 * 7 - 1));
+
+	// Scale only against days actually in the window so an older spike
+	// doesn't wash out the visible heatmap.
+	const startKey = toDateKey(start);
+	const endKey = toDateKey(end);
+	let maxCount = 0;
+	for (const [key, count] of activity) {
+		if (count > maxCount && key >= startKey && key <= endKey) maxCount = count;
+	}
 
 	const level = (count: number): HeatmapLevel => {
 		if (count <= 0 || maxCount === 0) return 0;
@@ -59,7 +67,7 @@ export function buildHeatmap(activity: Map<string, number>, today: Date): Heatma
 	const monthLabels: MonthLabel[] = [];
 	for (let i = 1; i < weeks.length; i++) {
 		if (weeks[i][0].date.getMonth() !== weeks[i - 1][0].date.getMonth()) {
-			monthLabels.push({ columnIndex: i, label: MONTHS[weeks[i][0].date.getMonth()] });
+			monthLabels.push({ columnIndex: i + 1, label: MONTHS[weeks[i][0].date.getMonth()] });
 		}
 	}
 

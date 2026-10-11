@@ -19,8 +19,11 @@ export function selectVaultFiles(files: VaultFile[], isIgnored: (path: string) =
 	);
 }
 
-export function buildFolderCounts(files: VaultFile[]): FolderCount[] {
+export function buildFolderCounts(files: VaultFile[], folderNames: string[] = []): FolderCount[] {
 	const counts = new Map<string, number>();
+	for (const name of folderNames) {
+		counts.set(name, 0);
+	}
 	for (const file of files) {
 		const slash = file.path.indexOf("/");
 		if (slash === -1) continue;
